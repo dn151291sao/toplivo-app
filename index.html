@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Топливо — продажи</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:20px 15px 40px}
+h1{font-size:25px;margin:5px 0}
+.sub{color:#94a3b8;font-size:13px;margin-bottom:22px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:17px;margin-bottom:15px}
+label{display:block;color:#94a3b8;font-size:13px;margin:13px 0 7px}
+input,select{width:100%;padding:13px;background:#0f172a;color:white;border:1px solid #475569;border-radius:10px;font-size:17px}
+input:focus,select:focus{outline:2px solid #38bdf8}
+.fuels{display:flex;gap:9px}
+.fuel{flex:1;padding:14px 5px;border:1px solid #475569;border-radius:11px;background:#0f172a;color:white;font-size:15px}
+.fuel.active{border:2px solid #38bdf8;background:#164e63}
+button{cursor:pointer}
+.primary{width:100%;padding:16px;border:0;border-radius:12px;background:#0ea5e9;color:#fff;font-size:17px;font-weight:bold;margin-top:17px}
+.result{background:#0f172a;border-radius:12px;padding:15px;margin-top:15px}
+.line{display:flex;justify-content:space-between;gap:10px;padding:7px 0;color:#cbd5e1;font-size:14px}
+.profit{font-size:29px;font-weight:bold;color:#4ade80;text-align:center;padding:12px 0}
+.small{color:#94a3b8;font-size:12px;text-align:center}
+h2{font-size:18px;margin:0 0 12px}
+.entry{border-top:1px solid #334155;padding:12px 0;font-size:13px}
+.entry strong{font-size:17px;color:#4ade80}
+.delete{float:right;background:#7f1d1d;color:white;border:0;border-radius:7px;padding:6px 10px}
+.secondary{width:100%;padding:12px;border:1px solid #475569;background:#334155;color:white;border-radius:10px;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>⛽ ТОПЛИВО</h1>
+<div class="sub">Учёт продаж и расчёт прибыли</div>
+
+<div class="card">
+<h2>Новая продажа</h2>
+<div class="fuels">
+<button class="fuel active" id="diesel" onclick="setFuel('Дизель')">🟢 Дизель</button>
+<button class="fuel" id="petrol" onclick="setFuel('Бензин')">🔴 Бензин</button>
+</div>
+
+<label>Цена на АЗС (грн/л)</label>
+<input id="station" type="number" step="0.01" placeholder="Например, 58.90">
+
+<label>Количество проданного топлива (л)</label>
+<input id="volume" type="number" step="20" value="20">
+
+<label>Цена продажи (грн/л)</label>
+<input id="sale" type="number" step="0.01" placeholder="АЗС минус 4 грн">
+
+<label>Доставка (грн)</label>
+<input id="delivery" type="number" value="200">
+
+<div class="result">
+<div class="line"><span>Моя закупочная цена</span><b id="costPrice">—</b></div>
+<div class="line"><span>Фактически получено</span><b id="actual">—</b></div>
+<div class="line"><span>Выручка от продажи</span><b id="revenue">—</b></div>
+<div class="line"><span>Стоимость закупки</span><b id="cost">—</b></div>
+<div class="line"><span>Доставка</span><b id="deliveryView">200 грн</b></div>
+<div class="profit" id="profit">0 грн</div>
+<div class="small">Расчётная прибыль с учётом доставки</div>
+</div>
+<button class="primary" onclick="addSale()">＋ СОХРАНИТЬ ПРОДАЖУ</button>
+</div>
+
+<div class="card">
+<h2>📊 История продаж</h2>
+<div id="history">Продаж пока нет</div>
+<div class="line"><b>Общая прибыль</b><b id="totalProfit">0 грн</b></div>
+<div class="line"><b>Всего продано</b><b id="totalVolume">0 л</b></div>
+<button class="secondary" onclick="clearHistory()">Очистить историю</button>
+</div>
+
+<script>
+let fuel='Дизель';
+let sales=JSON.parse(localStorage.getItem('fuelSales')||'[]');
+
+const el=id=>document.getElementById(id);
+const num=id=>Number(el(id).value)||0;
+const money=n=>n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' грн';
+
+function setFuel(type){
+ fuel=type;
+ el('diesel').classList.toggle('active',type==='Дизель');
+ el('petrol').classList.toggle('active',type==='Бензин');
+}
+
+function calculate(){
+ const station=num('station');
+ const volume=num('volume');
+ const sale=num('sale');
+ const delivery=num('delivery');
+ const purchase=(station-4)*0.92;
+ const actual=volume/20*19;
+ const revenue=volume*sale;
+ const cost=actual*purchase;
+ const profit=revenue+delivery-cost;
+
+ el('costPrice').textContent=station>4?money(purchase)+'/л':'—';
+ el('actual').textContent=actual.toFixed(2)+' л';
+ el('revenue').textContent=money(revenue);
+ el('cost').textContent=money(cost);
+ el('deliveryView').textContent=money(delivery);
+ el('profit').textContent=money(profit);
+ return {station,volume,sale,delivery,purchase,actual,revenue,cost,profit};
+}
+
+['station','volume','sale','delivery'].forEach(id=>{
+ el(id).addEventListener('input',()=>{
+  if(id==='station' && !el('sale').dataset.manual){
+   el('sale').value=num('station')>0?(num('station')-4).toFixed(2):'';
+  }
+  calculate();
+ });
+});
+
+el('sale').addEventListener('input',()=>el('sale').dataset.manual='1');
+
+function addSale(){
+ const d=calculate();
+ if(d.station<=4||d.volume<=0||d.sale<=0){
+  alert('Заполни цену АЗС, объём и цену продажи');
+  return;
+ }
+ if(d.volume%20!==0){
+  alert('Количество продажи должно быть кратно 20 литрам');
+  return;
+ }
+ sales.unshift({...d,fuel,date:new Date().toLocaleString('ru-UA')});
+ localStorage.setItem('fuelSales',JSON.stringify(sales));
+ render();
+ alert('Продажа сохранена!');
+}
+
+function render(){
+ el('history').innerHTML=sales.length?'':'Продаж пока нет';
+ sales.forEach((s,i)=>{
+  el('history').innerHTML+=`
+  <div class="entry">
+  <button class="delete" onclick="removeSale(${i})">Удалить</button>
+  <b>${s.fuel}</b> · ${s.date}<br>
+  Продано: ${s.volume} л · Факт: ${s.actual.toFixed(2)} л<br>
+  Цена продажи: ${money(s.sale)}/л<br>
+  <strong>${money(s.profit)}</strong>
+  </div>`;
+ });
+ el('totalProfit').textContent=money(sales.reduce((a,s)=>a+s.profit,0));
+ el('totalVolume').textContent=sales.reduce((a,s)=>a+s.volume,0)+' л';
+}
+
+function removeSale(i){
+ if(confirm('Удалить эту продажу?')){
+  sales.splice(i,1);
+  localStorage.setItem('fuelSales',JSON.stringify(sales));
+  render();
+ }
+}
+
+function clearHistory(){
+ if(confirm('Удалить всю историю продаж?')){
+  sales=[];
+  localStorage.setItem('fuelSales','[]');
+  render();
+ }
+}
+
+calculate();
+render();
+</script>
+</body>
+</html>
