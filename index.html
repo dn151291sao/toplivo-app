@@ -1,173 +1,443 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#101827">
-<title>Топливо — продажи</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учёт топлива</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#101827;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:20px 15px 40px}
-h1{font-size:25px;margin:5px 0}
-.sub{color:#94a3b8;font-size:13px;margin-bottom:22px}
-.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:17px;margin-bottom:15px}
-label{display:block;color:#94a3b8;font-size:13px;margin:13px 0 7px}
-input,select{width:100%;padding:13px;background:#0f172a;color:white;border:1px solid #475569;border-radius:10px;font-size:17px}
-input:focus,select:focus{outline:2px solid #38bdf8}
-.fuels{display:flex;gap:9px}
-.fuel{flex:1;padding:14px 5px;border:1px solid #475569;border-radius:11px;background:#0f172a;color:white;font-size:15px}
-.fuel.active{border:2px solid #38bdf8;background:#164e63}
-button{cursor:pointer}
-.primary{width:100%;padding:16px;border:0;border-radius:12px;background:#0ea5e9;color:#fff;font-size:17px;font-weight:bold;margin-top:17px}
-.result{background:#0f172a;border-radius:12px;padding:15px;margin-top:15px}
-.line{display:flex;justify-content:space-between;gap:10px;padding:7px 0;color:#cbd5e1;font-size:14px}
-.profit{font-size:29px;font-weight:bold;color:#4ade80;text-align:center;padding:12px 0}
-.small{color:#94a3b8;font-size:12px;text-align:center}
-h2{font-size:18px;margin:0 0 12px}
-.entry{border-top:1px solid #334155;padding:12px 0;font-size:13px}
-.entry strong{font-size:17px;color:#4ade80}
-.delete{float:right;background:#7f1d1d;color:white;border:0;border-radius:7px;padding:6px 10px}
-.secondary{width:100%;padding:12px;border:1px solid #475569;background:#334155;color:white;border-radius:10px;margin-top:10px}
+body{font-family:Arial;background:#f2f4f7;margin:0;padding:15px;color:#222}
+.container{max-width:700px;margin:auto}
+h1{text-align:center}
+.card{background:white;padding:18px;border-radius:14px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{border:0;border-radius:9px;padding:13px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
+.primary{background:#1677ff;color:white;width:100%}
+.secondary{background:#e8edf3;color:#222;width:100%}
+.danger{background:#ffe5e5;color:#b00020}
+.result{background:#eef7ee;padding:12px;border-radius:10px;margin-top:15px;line-height:1.8}
+.profit{font-size:24px;font-weight:bold;color:#16803c}
+.sale{border-top:1px solid #eee;padding:12px 0}
+.small{color:#777;font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#f5f7fa;padding:12px;border-radius:10px}
+.stat strong{display:block;font-size:19px;margin-top:5px}
+.hidden{display:none}
+@media print{
+body{background:white;padding:0}
+body *{visibility:hidden}
+#printReport,#printReport *{visibility:visible}
+#printReport{display:block!important;position:absolute;left:0;top:0;width:100%;padding:20px}
+.no-print{display:none!important}
+}
 </style>
 </head>
 <body>
-<h1>⛽ ТОПЛИВО</h1>
-<div class="sub">Учёт продаж и расчёт прибыли</div>
+<div class="container">
 
-<div class="card">
+<h1>⛽ Учёт топлива</h1>
+
+<div class="card no-print">
 <h2>Новая продажа</h2>
-<div class="fuels">
-<button class="fuel active" id="diesel" onclick="setFuel('Дизель')">🟢 Дизель</button>
-<button class="fuel" id="petrol" onclick="setFuel('Бензин')">🔴 Бензин</button>
-</div>
+
+<label>Топливо</label>
+<select id="fuel">
+<option value="Дизель">Дизель</option>
+<option value="Бензин">Бензин</option>
+</select>
 
 <label>Цена на АЗС (грн/л)</label>
-<input id="station" type="number" step="0.01" placeholder="Например, 58.90">
+<input type="number" id="stationPrice" step="0.01" value="102.9">
 
-<label>Количество проданного топлива (л)</label>
-<input id="volume" type="number" step="20" value="20">
+<label>Продано (литров)</label>
+<input type="number" id="volume" step="20" value="100">
 
 <label>Цена продажи (грн/л)</label>
-<input id="sale" type="number" step="0.01" placeholder="АЗС минус 4 грн">
+<input type="number" id="salePrice" step="0.01" value="98.9">
 
 <label>Доставка (грн)</label>
-<input id="delivery" type="number" value="200">
+<input type="number" id="delivery" step="1" value="200">
 
 <div class="result">
-<div class="line"><span>Моя закупочная цена</span><b id="costPrice">—</b></div>
-<div class="line"><span>Фактически получено</span><b id="actual">—</b></div>
-<div class="line"><span>Выручка от продажи</span><b id="revenue">—</b></div>
-<div class="line"><span>Стоимость закупки</span><b id="cost">—</b></div>
-<div class="line"><span>Доставка</span><b id="deliveryView">200 грн</b></div>
-<div class="profit" id="profit">0 грн</div>
-<div class="small">Расчётная прибыль с учётом доставки</div>
-</div>
-<button class="primary" onclick="addSale()">＋ СОХРАНИТЬ ПРОДАЖУ</button>
+<div>Закупочная цена: <b id="purchase">0.00</b> грн/л</div>
+<div>Фактически залито: <b id="actual">0</b> л</div>
+<div>Выручка: <b id="revenue">0.00</b> грн</div>
+<div>Стоимость топлива: <b id="cost">0.00</b> грн</div>
+<div class="profit">Прибыль: <span id="profit">0.00</span> грн</div>
 </div>
 
-<div class="card">
-<h2>📊 История продаж</h2>
-<div id="history">Продаж пока нет</div>
-<div class="line"><b>Общая прибыль</b><b id="totalProfit">0 грн</b></div>
-<div class="line"><b>Всего продано</b><b id="totalVolume">0 л</b></div>
-<button class="secondary" onclick="clearHistory()">Очистить историю</button>
+<button class="primary" onclick="addSale()">Сохранить продажу</button>
+</div>
+
+<div class="card no-print">
+<h2>📊 Отчёты</h2>
+
+<label>Период</label>
+<select id="period" onchange="renderReports()">
+<option value="today">Сегодня</option>
+<option value="yesterday">Вчера</option>
+<option value="day">Выбранный день</option>
+<option value="month">Месяц</option>
+<option value="all">Всё время</option>
+</select>
+
+<div id="dayFilter">
+<label>Дата</label>
+<input type="date" id="reportDate" onchange="renderReports()">
+</div>
+
+<div id="monthFilter" class="hidden">
+<label>Месяц</label>
+<input type="month" id="reportMonth" onchange="renderReports()">
+</div>
+
+<div class="stats" style="margin-top:15px">
+<div class="stat">Продаж<strong id="count">0</strong></div>
+<div class="stat">Продано<strong><span id="totalVolume">0</span> л</strong></div>
+<div class="stat">Фактически залито<strong><span id="totalActual">0</span> л</strong></div>
+<div class="stat">Выручка<strong><span id="totalRevenue">0.00</span> грн</strong></div>
+<div class="stat">Закупка<strong><span id="totalCost">0.00</span> грн</strong></div>
+<div class="stat">Доставка<strong><span id="totalDelivery">0.00</span> грн</strong></div>
+</div>
+
+<div class="result">
+<div class="profit">Прибыль за период: <span id="totalProfit">0.00</span> грн</div>
+</div>
+
+<button class="primary" onclick="downloadPDF()">📄 Скачать отчёт PDF</button>
+<button class="secondary" onclick="exportJSON()">💾 Скачать резервную копию</button>
+
+<label>Восстановить резервную копию</label>
+<input type="file" id="importFile" accept=".json,application/json" onchange="importJSON(event)">
+</div>
+
+<div class="card no-print">
+<h2>История продаж</h2>
+<div id="history"></div>
+<button class="danger" onclick="clearHistory()">Удалить всю историю</button>
+</div>
+
+<div id="printReport" style="display:none">
+<h1>Отчёт по продажам топлива</h1>
+<p id="printPeriod"></p>
+<div id="printStats"></div>
+<h2>Продажи</h2>
+<div id="printHistory"></div>
+</div>
+
 </div>
 
 <script>
-let fuel='Дизель';
-let sales=JSON.parse(localStorage.getItem('fuelSales')||'[]');
+const STORAGE_KEY="fuelSales";
+let sales=loadSales();
 
-const el=id=>document.getElementById(id);
-const num=id=>Number(el(id).value)||0;
-const money=n=>n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' грн';
+function el(id){return document.getElementById(id)}
 
-function setFuel(type){
- fuel=type;
- el('diesel').classList.toggle('active',type==='Дизель');
- el('petrol').classList.toggle('active',type==='Бензин');
+function todayKey(){
+const d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function dateKey(date){
+const d=new Date(date);
+if(isNaN(d.getTime()))return todayKey();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function money(value){return Number(value||0).toFixed(2)}
+
+function loadSales(){
+try{
+const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));
+if(!Array.isArray(saved))return [];
+return saved.map(normalizeSale);
+}catch{return []}
+}
+
+function normalizeSale(s){
+return {
+id:s.id||Date.now()+Math.random(),
+date:s.date||new Date().toLocaleString("ru-UA"),
+dateKey:s.dateKey||dateKey(s.date||new Date()),
+fuel:s.fuel||"Дизель",
+stationPrice:Number(s.stationPrice)||0,
+purchase:Number(s.purchase)||0,
+volume:Number(s.volume)||0,
+actual:Number(s.actual)||0,
+salePrice:Number(s.salePrice)||0,
+delivery:Number(s.delivery)||0,
+revenue:Number(s.revenue)||0,
+cost:Number(s.cost)||0,
+profit:Number(s.profit)||0
+};
+}
+
+function saveSales(){
+localStorage.setItem(STORAGE_KEY,JSON.stringify(sales));
 }
 
 function calculate(){
- const station=num('station');
- const volume=num('volume');
- const sale=num('sale');
- const delivery=num('delivery');
- const purchase=(station-4)*0.92;
- const actual=volume/20*19;
- const revenue=volume*sale;
- const cost=actual*purchase;
- const profit=revenue+delivery-cost;
+const station=Number(el("stationPrice").value)||0;
+const volume=Number(el("volume").value)||0;
+const salePrice=Number(el("salePrice").value)||0;
+const delivery=Number(el("delivery").value)||0;
 
- el('costPrice').textContent=station>4?money(purchase)+'/л':'—';
- el('actual').textContent=actual.toFixed(2)+' л';
- el('revenue').textContent=money(revenue);
- el('cost').textContent=money(cost);
- el('deliveryView').textContent=money(delivery);
- el('profit').textContent=money(profit);
- return {station,volume,sale,delivery,purchase,actual,revenue,cost,profit};
+const purchase=(station-4)*0.92;
+const actual=volume/20*19;
+const revenue=volume*salePrice;
+const cost=actual*purchase;
+const profit=revenue+delivery-cost;
+
+el("purchase").textContent=money(purchase);
+el("actual").textContent=actual.toFixed(2);
+el("revenue").textContent=money(revenue);
+el("cost").textContent=money(cost);
+el("profit").textContent=money(profit);
+
+return {
+fuel:el("fuel").value,
+stationPrice:station,
+purchase,
+volume,
+actual,
+salePrice,
+delivery,
+revenue,
+cost,
+profit
+};
 }
-
-['station','volume','sale','delivery'].forEach(id=>{
- el(id).addEventListener('input',()=>{
-  if(id==='station' && !el('sale').dataset.manual){
-   el('sale').value=num('station')>0?(num('station')-4).toFixed(2):'';
-  }
-  calculate();
- });
-});
-
-el('sale').addEventListener('input',()=>el('sale').dataset.manual='1');
 
 function addSale(){
- const d=calculate();
- if(d.station<=4||d.volume<=0||d.sale<=0){
-  alert('Заполни цену АЗС, объём и цену продажи');
-  return;
- }
- if(d.volume%20!==0){
-  alert('Количество продажи должно быть кратно 20 литрам');
-  return;
- }
- sales.unshift({...d,fuel,date:new Date().toLocaleString('ru-UA')});
- localStorage.setItem('fuelSales',JSON.stringify(sales));
- render();
- alert('Продажа сохранена!');
+const data=calculate();
+
+if(data.volume<=0){
+alert("Укажи объём продажи");
+return;
 }
 
-function render(){
- el('history').innerHTML=sales.length?'':'Продаж пока нет';
- sales.forEach((s,i)=>{
-  el('history').innerHTML+=`
-  <div class="entry">
-  <button class="delete" onclick="removeSale(${i})">Удалить</button>
-  <b>${s.fuel}</b> · ${s.date}<br>
-  Продано: ${s.volume} л · Факт: ${s.actual.toFixed(2)} л<br>
-  Цена продажи: ${money(s.sale)}/л<br>
-  <strong>${money(s.profit)}</strong>
-  </div>`;
- });
- el('totalProfit').textContent=money(sales.reduce((a,s)=>a+s.profit,0));
- el('totalVolume').textContent=sales.reduce((a,s)=>a+s.volume,0)+' л';
+if(data.volume%20!==0){
+alert("Объём продажи должен быть кратен 20 литрам");
+return;
 }
 
-function removeSale(i){
- if(confirm('Удалить эту продажу?')){
-  sales.splice(i,1);
-  localStorage.setItem('fuelSales',JSON.stringify(sales));
-  render();
- }
+if(data.stationPrice<=4){
+alert("Проверь цену на АЗС");
+return;
+}
+
+sales.unshift({
+...data,
+id:Date.now(),
+date:new Date().toLocaleString("ru-UA"),
+dateKey:todayKey()
+});
+
+saveSales();
+renderReports();
+renderHistory();
+alert("Продажа сохранена");
+}
+
+function getSelectedSales(){
+const period=el("period").value;
+const today=todayKey();
+
+const yesterdayDate=new Date();
+yesterdayDate.setDate(yesterdayDate.getDate()-1);
+const yesterday=dateKey(yesterdayDate);
+
+if(period==="today")return sales.filter(s=>s.dateKey===today);
+
+if(period==="yesterday")return sales.filter(s=>s.dateKey===yesterday);
+
+if(period==="day"){
+const selected=el("reportDate").value||today;
+return sales.filter(s=>s.dateKey===selected);
+}
+
+if(period==="month"){
+const month=el("reportMonth").value||today.slice(0,7);
+return sales.filter(s=>s.dateKey.startsWith(month));
+}
+
+return sales;
+}
+
+function renderReports(){
+const period=el("period").value;
+
+el("dayFilter").classList.toggle("hidden",period!=="day");
+el("monthFilter").classList.toggle("hidden",period!=="month");
+
+if(!el("reportDate").value)el("reportDate").value=todayKey();
+if(!el("reportMonth").value)el("reportMonth").value=todayKey().slice(0,7);
+
+const list=getSelectedSales();
+
+const count=list.length;
+const volume=list.reduce((sum,s)=>sum+s.volume,0);
+const actual=list.reduce((sum,s)=>sum+s.actual,0);
+const revenue=list.reduce((sum,s)=>sum+s.revenue,0);
+const cost=list.reduce((sum,s)=>sum+s.cost,0);
+const delivery=list.reduce((sum,s)=>sum+s.delivery,0);
+const profit=list.reduce((sum,s)=>sum+s.profit,0);
+
+el("count").textContent=count;
+el("totalVolume").textContent=volume.toFixed(2);
+el("totalActual").textContent=actual.toFixed(2);
+el("totalRevenue").textContent=money(revenue);
+el("totalCost").textContent=money(cost);
+el("totalDelivery").textContent=money(delivery);
+el("totalProfit").textContent=money(profit);
+}
+
+function renderHistory(){
+const history=el("history");
+
+if(!sales.length){
+history.innerHTML="<p>Продаж пока нет</p>";
+return;
+}
+
+history.innerHTML=sales.map(s=>`
+<div class="sale">
+<b>${escapeHTML(s.fuel)}</b>
+<div class="small">${escapeHTML(s.date)}</div>
+<div>Продано: ${s.volume} л | Фактически: ${s.actual.toFixed(2)} л</div>
+<div>Цена продажи: ${money(s.salePrice)} грн/л</div>
+<div>Прибыль: <b style="color:#16803c">${money(s.profit)} грн</b></div>
+<button class="danger" onclick="deleteSale('${s.id}')">Удалить</button>
+</div>
+`).join("");
+}
+
+function escapeHTML(value){
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+}
+
+function deleteSale(id){
+if(!confirm("Удалить эту продажу?"))return;
+sales=sales.filter(s=>String(s.id)!==String(id));
+saveSales();
+renderReports();
+renderHistory();
 }
 
 function clearHistory(){
- if(confirm('Удалить всю историю продаж?')){
-  sales=[];
-  localStorage.setItem('fuelSales','[]');
-  render();
- }
+if(!confirm("Удалить всю историю продаж?"))return;
+sales=[];
+saveSales();
+renderReports();
+renderHistory();
 }
 
+function getPeriodName(){
+const period=el("period").value;
+
+if(period==="today")return "Сегодня";
+if(period==="yesterday")return "Вчера";
+if(period==="day")return "Дата: "+el("reportDate").value;
+if(period==="month")return "Месяц: "+el("reportMonth").value;
+
+return "Всё время";
+}
+
+function downloadPDF(){
+const list=getSelectedSales();
+
+const volume=list.reduce((sum,s)=>sum+s.volume,0);
+const actual=list.reduce((sum,s)=>sum+s.actual,0);
+const revenue=list.reduce((sum,s)=>sum+s.revenue,0);
+const cost=list.reduce((sum,s)=>sum+s.cost,0);
+const delivery=list.reduce((sum,s)=>sum+s.delivery,0);
+const profit=list.reduce((sum,s)=>sum+s.profit,0);
+
+el("printPeriod").textContent=getPeriodName()+" | "+new Date().toLocaleString("ru-UA");
+
+el("printStats").innerHTML=`
+<p>Количество продаж: ${list.length}</p>
+<p>Продано: ${volume.toFixed(2)} л</p>
+<p>Фактически залито: ${actual.toFixed(2)} л</p>
+<p>Выручка: ${money(revenue)} грн</p>
+<p>Стоимость топлива: ${money(cost)} грн</p>
+<p>Доставка: ${money(delivery)} грн</p>
+<h2>Прибыль: ${money(profit)} грн</h2>
+`;
+
+el("printHistory").innerHTML=list.map(s=>`
+<p>${escapeHTML(s.date)} | ${escapeHTML(s.fuel)} |
+Продано ${s.volume} л | Прибыль ${money(s.profit)} грн</p>
+`).join("");
+
+window.print();
+}
+
+function exportJSON(){
+const blob=new Blob([JSON.stringify(sales,null,2)],{type:"application/json"});
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+
+a.href=url;
+a.download="toplivo-backup-"+todayKey()+".json";
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+URL.revokeObjectURL(url);
+}
+
+function importJSON(event){
+const file=event.target.files[0];
+if(!file)return;
+
+const reader=new FileReader();
+
+reader.onload=function(){
+try{
+const imported=JSON.parse(reader.result);
+
+if(!Array.isArray(imported)){
+throw new Error("Некорректный формат");
+}
+
+if(!confirm("Заменить текущую историю продаж резервной копией?")){
+return;
+}
+
+sales=imported.map(normalizeSale);
+saveSales();
+renderReports();
+renderHistory();
+
+alert("Резервная копия восстановлена");
+}catch{
+alert("Не удалось прочитать файл резервной копии");
+}
+
+event.target.value="";
+};
+
+reader.readAsText(file);
+}
+
+["stationPrice","volume","salePrice","delivery"].forEach(id=>{
+el(id).addEventListener("input",calculate);
+});
+
+el("reportDate").value=todayKey();
+el("reportMonth").value=todayKey().slice(0,7);
+
 calculate();
-render();
+renderReports();
+renderHistory();
 </script>
 </body>
 </html>
