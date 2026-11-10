@@ -3,441 +3,463 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Учёт топлива</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17131f">
+<title>Мой бизнес</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial;background:#f2f4f7;margin:0;padding:15px;color:#222}
-.container{max-width:700px;margin:auto}
-h1{text-align:center}
-.card{background:white;padding:18px;border-radius:14px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
-label{display:block;margin-top:12px;font-weight:bold}
-input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #ccc;border-radius:8px;font-size:16px}
-button{border:0;border-radius:9px;padding:13px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
-.primary{background:#1677ff;color:white;width:100%}
-.secondary{background:#e8edf3;color:#222;width:100%}
-.danger{background:#ffe5e5;color:#b00020}
-.result{background:#eef7ee;padding:12px;border-radius:10px;margin-top:15px;line-height:1.8}
-.profit{font-size:24px;font-weight:bold;color:#16803c}
-.sale{border-top:1px solid #eee;padding:12px 0}
-.small{color:#777;font-size:13px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#f5f7fa;padding:12px;border-radius:10px}
-.stat strong{display:block;font-size:19px;margin-top:5px}
-.hidden{display:none}
-@media print{
-body{background:white;padding:0}
-body *{visibility:hidden}
-#printReport,#printReport *{visibility:visible}
-#printReport{display:block!important;position:absolute;left:0;top:0;width:100%;padding:20px}
-.no-print{display:none!important}
-}
+body{margin:0;background:#17131f;color:#f5f0ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:16px}
+.app{max-width:420px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.logo{font-size:23px;font-weight:800}
+.logo span{color:#a855f7}
+.status{font-size:11px;color:#b9a8d1}
+h2{font-size:18px;margin:0 0 18px}
+h3{font-size:15px}
+.hidden{display:none!important}
+.wheel{position:relative;width:300px;height:300px;margin:0 auto 25px;border-radius:50%;background:linear-gradient(145deg,#211a2d,#120f19);box-shadow:12px 12px 30px #0d0a12,-8px -8px 24px #30253d}
+.center{position:absolute;width:112px;height:112px;left:94px;top:94px;border-radius:50%;background:#1b1525;box-shadow:inset 5px 5px 12px #0d0a12,inset -4px -4px 10px #30233e;display:flex;align-items:center;justify-content:center;text-align:center;color:#bda5d9;font-size:13px}
+.wheel-btn{position:absolute;width:108px;height:108px;border:1px solid #5b3679;border-radius:50%;background:linear-gradient(145deg,#30203f,#1a1324);color:#eee2ff;box-shadow:6px 6px 14px #100c17,-4px -4px 12px #352641;font-size:14px;font-weight:700}
+.wheel-btn:active{box-shadow:inset 5px 5px 12px #100c17}
+.fuel{top:8px;left:96px}
+.parts{bottom:8px;left:96px}
+.notes{top:96px;left:8px;width:78px;height:78px;font-size:11px}
+.card{background:linear-gradient(145deg,#241b30,#191320);border:1px solid #342342;border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:8px 8px 20px #100c16}
+label{display:block;color:#bdaed0;font-size:12px;margin-top:13px}
+input,select{display:block;width:100%;background:#17121f;border:1px solid #443052;border-radius:12px;color:white;padding:13px;margin:8px 0;font-size:16px;outline:none}
+input:focus,select:focus{border-color:#a855f7}
+button{font-family:inherit;cursor:pointer}
+.action{width:100%;border:0;border-radius:13px;padding:14px;margin-top:12px;background:linear-gradient(135deg,#9333ea,#6d28d9);color:white;font-weight:700;font-size:14px}
+.secondary{background:#241a30;border:1px solid #49335e}
+.back{background:none;color:#c084fc;border:0;padding:0;margin-bottom:20px;font-size:15px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:11px 0;font-size:13px;color:#c7b6d9}
+.row strong{color:#f5f0ff;text-align:right}
+.profit{color:#c084fc!important;font-size:23px;font-weight:800}
+.result{margin-top:18px;padding:15px;border-radius:15px;background:#17121f}
+.item{background:#1a1423;border:1px solid #392747;border-radius:13px;padding:12px;margin-top:10px}
+.item .row{margin:5px 0}
+.small{color:#8f7da5;font-size:11px;text-align:center;margin:20px 0}
+hr{border-color:#392747}
 </style>
 </head>
+
 <body>
-<div class="container">
+<div class="app">
+<header>
+<div class="logo">МОЙ <span>БИЗНЕС</span></div>
+<div class="status">● Личный учет</div>
+</header>
 
-<h1>⛽ Учёт топлива</h1>
+<section id="home">
+<h2>Главное меню</h2>
+<div class="wheel">
+<button class="wheel-btn fuel" onclick="openPage('fuel')">⛽<br>Топливо</button>
+<button class="wheel-btn parts" onclick="openPage('parts')">⚙️<br>Запчасти</button>
+<button class="wheel-btn notes" onclick="openPage('notes')">📝<br>Заметки</button>
+<div class="center">МОЙ<br>БИЗНЕС</div>
+</div>
 
-<div class="card no-print">
-<h2>Новая продажа</h2>
+<div class="card">
+<div class="row"><span>Продаж сегодня</span><strong id="todayCount">0</strong></div>
+<div class="row"><span>Прибыль сегодня</span><strong class="profit" id="todayProfit">0 грн</strong></div>
+<div class="row"><span>Долгов всего</span><strong id="totalDebt">0 грн</strong></div>
+<button class="action" onclick="openPage('debts')">💜 Долги клиентов</button>
+</div>
+</section>
 
-<label>Топливо</label>
-<select id="fuel">
-<option value="Дизель">Дизель</option>
-<option value="Бензин">Бензин</option>
+<section id="fuel" class="hidden">
+<button class="back" onclick="openPage('home')">← Главная</button>
+<h2>⛽ Продажа топлива</h2>
+
+<div class="card">
+<h3>Клиент</h3>
+<select id="clientSelect"></select>
+<button class="action secondary" onclick="showNewClient()">＋ Добавить клиента</button>
+
+<div id="newClientBox" class="hidden">
+<label>Имя нового клиента</label>
+<input id="newClientName" placeholder="Введите имя">
+<button class="action" onclick="addClient()">Сохранить клиента</button>
+</div>
+
+<label>Цена на АЗС, грн/л</label>
+<input id="station" type="number" step="0.01" inputmode="decimal" placeholder="Цена АЗС">
+
+<div class="row">
+<span>Цена продажи</span>
+<strong id="sellPreview">—</strong>
+</div>
+
+<button class="action secondary" onclick="savePrices()">💾 Сохранить цены</button>
+
+<label>Количество канистр по 20 л</label>
+<input id="cans" type="number" min="1" step="1" inputmode="numeric" placeholder="Количество">
+
+<label>Доставка</label>
+<select id="delivery">
+<option value="200">С доставкой — 200 грн</option>
+<option value="0">Без доставки</option>
 </select>
 
-<label>Цена на АЗС (грн/л)</label>
-<input type="number" id="stationPrice" step="0.01" value="102.9">
+<button class="action" onclick="calculate()">Рассчитать прибыль</button>
 
-<label>Продано (литров)</label>
-<input type="number" id="volume" step="20" value="100">
-
-<label>Цена продажи (грн/л)</label>
-<input type="number" id="salePrice" step="0.01" value="98.9">
-
-<label>Доставка (грн)</label>
-<input type="number" id="delivery" step="1" value="200">
-
-<div class="result">
-<div>Закупочная цена: <b id="purchase">0.00</b> грн/л</div>
-<div>Фактически залито: <b id="actual">0</b> л</div>
-<div>Выручка: <b id="revenue">0.00</b> грн</div>
-<div>Стоимость топлива: <b id="cost">0.00</b> грн</div>
-<div class="profit">Прибыль: <span id="profit">0.00</span> грн</div>
+<div id="result" class="result hidden">
+<div class="row"><span>Продано</span><strong id="sold"></strong></div>
+<div class="row"><span>Фактически получено</span><strong id="actual"></strong></div>
+<div class="row"><span>Цена продажи</span><strong id="sellPrice"></strong></div>
+<div class="row"><span>Закупка за литр</span><strong id="buyPrice"></strong></div>
+<div class="row"><span>Доставка</span><strong id="deliveryCost"></strong></div>
+<hr>
+<div class="row"><span>Прибыль</span><strong class="profit" id="profit"></strong></div>
+<button class="action" onclick="saveSale()">Сохранить продажу</button>
+</div>
 </div>
 
-<button class="primary" onclick="addSale()">Сохранить продажу</button>
+<div class="card">
+<h3>История продаж</h3>
+<div id="history">Продаж пока нет</div>
+</div>
+</section>
+
+<section id="debts" class="hidden">
+<button class="back" onclick="openPage('home')">← Главная</button>
+<h2>💜 Долги клиентов</h2>
+
+<div class="card">
+<h3>Добавить долг</h3>
+<label>Клиент</label>
+<select id="debtClient"></select>
+<label>Сумма долга, грн</label>
+<input id="debtAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Сумма">
+<label>Комментарий</label>
+<input id="debtComment" placeholder="Например: топливо">
+<button class="action" onclick="addDebt()">＋ Добавить долг</button>
 </div>
 
-<div class="card no-print">
-<h2>📊 Отчёты</h2>
-
-<label>Период</label>
-<select id="period" onchange="renderReports()">
-<option value="today">Сегодня</option>
-<option value="yesterday">Вчера</option>
-<option value="day">Выбранный день</option>
-<option value="month">Месяц</option>
-<option value="all">Всё время</option>
-</select>
-
-<div id="dayFilter">
-<label>Дата</label>
-<input type="date" id="reportDate" onchange="renderReports()">
+<div class="card">
+<h3>Список долгов</h3>
+<div id="debtList">Долгов пока нет</div>
 </div>
+</section>
 
-<div id="monthFilter" class="hidden">
-<label>Месяц</label>
-<input type="month" id="reportMonth" onchange="renderReports()">
-</div>
+<section id="parts" class="hidden">
+<button class="back" onclick="openPage('home')">← Главная</button>
+<h2>⚙️ Запчасти</h2>
+<div class="card">Раздел запчастей добавим следующим этапом.</div>
+</section>
 
-<div class="stats" style="margin-top:15px">
-<div class="stat">Продаж<strong id="count">0</strong></div>
-<div class="stat">Продано<strong><span id="totalVolume">0</span> л</strong></div>
-<div class="stat">Фактически залито<strong><span id="totalActual">0</span> л</strong></div>
-<div class="stat">Выручка<strong><span id="totalRevenue">0.00</span> грн</strong></div>
-<div class="stat">Закупка<strong><span id="totalCost">0.00</span> грн</strong></div>
-<div class="stat">Доставка<strong><span id="totalDelivery">0.00</span> грн</strong></div>
-</div>
+<section id="notes" class="hidden">
+<button class="back" onclick="openPage('home')">← Главная</button>
+<h2>📝 Заметки</h2>
+<div class="card">Раздел заметок добавим следующим этапом.</div>
+</section>
 
-<div class="result">
-<div class="profit">Прибыль за период: <span id="totalProfit">0.00</span> грн</div>
-</div>
-
-<button class="primary" onclick="downloadPDF()">📄 Скачать отчёт PDF</button>
-<button class="secondary" onclick="exportJSON()">💾 Скачать резервную копию</button>
-
-<label>Восстановить резервную копию</label>
-<input type="file" id="importFile" accept=".json,application/json" onchange="importJSON(event)">
-</div>
-
-<div class="card no-print">
-<h2>История продаж</h2>
-<div id="history"></div>
-<button class="danger" onclick="clearHistory()">Удалить всю историю</button>
-</div>
-
-<div id="printReport" style="display:none">
-<h1>Отчёт по продажам топлива</h1>
-<p id="printPeriod"></p>
-<div id="printStats"></div>
-<h2>Продажи</h2>
-<div id="printHistory"></div>
-</div>
-
+<div class="small">МОЙ БИЗНЕС · Учет продаж</div>
 </div>
 
 <script>
-const STORAGE_KEY="fuelSales";
-let sales=loadSales();
-
-function el(id){return document.getElementById(id)}
-
-function todayKey(){
-const d=new Date();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
-
-function dateKey(date){
-const d=new Date(date);
-if(isNaN(d.getTime()))return todayKey();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
-
-function money(value){return Number(value||0).toFixed(2)}
-
-function loadSales(){
-try{
-const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));
-if(!Array.isArray(saved))return [];
-return saved.map(normalizeSale);
-}catch{return []}
-}
-
-function normalizeSale(s){
-return {
-id:s.id||Date.now()+Math.random(),
-date:s.date||new Date().toLocaleString("ru-UA"),
-dateKey:s.dateKey||dateKey(s.date||new Date()),
-fuel:s.fuel||"Дизель",
-stationPrice:Number(s.stationPrice)||0,
-purchase:Number(s.purchase)||0,
-volume:Number(s.volume)||0,
-actual:Number(s.actual)||0,
-salePrice:Number(s.salePrice)||0,
-delivery:Number(s.delivery)||0,
-revenue:Number(s.revenue)||0,
-cost:Number(s.cost)||0,
-profit:Number(s.profit)||0
+const KEY={
+ clients:"businessClients",
+ sales:"fuelSales",
+ debts:"fuelDebts",
+ station:"fuelStationPrice",
+ sell:"fuelSellPrice"
 };
+
+let currentSale=null;
+
+function read(key,fallback=[]){
+try{return JSON.parse(localStorage.getItem(key))??fallback}
+catch{return fallback}
+}
+function write(key,value){
+localStorage.setItem(key,JSON.stringify(value));
 }
 
-function saveSales(){
-localStorage.setItem(STORAGE_KEY,JSON.stringify(sales));
+function openPage(page){
+["home","fuel","parts","notes","debts"].forEach(id=>{
+document.getElementById(id).classList.add("hidden");
+});
+document.getElementById(page).classList.remove("hidden");
 }
 
-function calculate(){
-const station=Number(el("stationPrice").value)||0;
-const volume=Number(el("volume").value)||0;
-const salePrice=Number(el("salePrice").value)||0;
-const delivery=Number(el("delivery").value)||0;
+function clients(){return read(KEY.clients,[])}
+function sales(){return read(KEY.sales,[])}
+function debts(){return read(KEY.debts,[])}
 
-const purchase=(station-4)*0.92;
-const actual=volume/20*19;
-const revenue=volume*salePrice;
-const cost=actual*purchase;
-const profit=revenue+delivery-cost;
-
-el("purchase").textContent=money(purchase);
-el("actual").textContent=actual.toFixed(2);
-el("revenue").textContent=money(revenue);
-el("cost").textContent=money(cost);
-el("profit").textContent=money(profit);
-
-return {
-fuel:el("fuel").value,
-stationPrice:station,
-purchase,
-volume,
-actual,
-salePrice,
-delivery,
-revenue,
-cost,
-profit
-};
+function showNewClient(){
+document.getElementById("newClientBox").classList.toggle("hidden");
 }
 
-function addSale(){
-const data=calculate();
+function addClient(){
+const name=document.getElementById("newClientName").value.trim();
+if(!name){alert("Введите имя клиента");return}
 
-if(data.volume<=0){
-alert("Укажи объём продажи");
+let list=clients();
+if(list.some(x=>x.toLowerCase()===name.toLowerCase())){
+alert("Такой клиент уже есть");
 return;
 }
 
-if(data.volume%20!==0){
-alert("Объём продажи должен быть кратен 20 литрам");
-return;
+list.push(name);
+write(KEY.clients,list);
+document.getElementById("newClientName").value="";
+document.getElementById("newClientBox").classList.add("hidden");
+renderClients();
+document.getElementById("clientSelect").value=name;
+document.getElementById("debtClient").value=name;
 }
 
-if(data.stationPrice<=4){
-alert("Проверь цену на АЗС");
-return;
-}
+function renderClients(){
+const list=clients();
+["clientSelect","debtClient"].forEach(id=>{
+const select=document.getElementById(id);
+const old=select.value;
+select.innerHTML="";
+const empty=document.createElement("option");
+empty.value="";
+empty.textContent="Выбрать клиента";
+select.appendChild(empty);
 
-sales.unshift({
-...data,
-id:Date.now(),
-date:new Date().toLocaleString("ru-UA"),
-dateKey:todayKey()
+list.forEach(name=>{
+const opt=document.createElement("option");
+opt.value=name;
+opt.textContent=name;
+select.appendChild(opt);
 });
 
-saveSales();
-renderReports();
+if(list.includes(old))select.value=old;
+});
+}
+
+function loadPrices(){
+const station=localStorage.getItem(KEY.station);
+const sell=localStorage.getItem(KEY.sell);
+
+if(station!==null)document.getElementById("station").value=station;
+if(sell!==null)document.getElementById("sellPreview").textContent=Number(sell).toFixed(2)+" грн/л";
+updateSellPreview();
+}
+
+function updateSellPreview(){
+const station=Number(document.getElementById("station").value);
+if(station>4){
+const sell=station-4;
+document.getElementById("sellPreview").textContent=sell.toFixed(2)+" грн/л";
+}else{
+document.getElementById("sellPreview").textContent="—";
+}
+}
+
+function savePrices(){
+const station=Number(document.getElementById("station").value);
+if(!station||station<=4){alert("Введите корректную цену АЗС");return}
+
+const sell=station-4;
+localStorage.setItem(KEY.station,String(station));
+localStorage.setItem(KEY.sell,String(sell));
+document.getElementById("sellPreview").textContent=sell.toFixed(2)+" грн/л";
+alert("Цены сохранены");
+}
+
+document.getElementById("station").addEventListener("input",updateSellPreview);
+
+function calculate(){
+const station=Number(document.getElementById("station").value);
+const cans=Number(document.getElementById("cans").value);
+const delivery=Number(document.getElementById("delivery").value);
+
+if(!station||station<=4||!cans||cans<1){
+alert("Введите цену АЗС и количество канистр");
+return;
+}
+
+const sold=cans*20;
+const actual=cans*19;
+const sellPrice=station-4;
+const buyPrice=(station-4)*0.92;
+
+// Выручка за проданные 20 л.
+// Себестоимость фактически полученных 19 л.
+// Доставка учитывается в прибыли.
+const income=sold*sellPrice;
+const purchase=actual*buyPrice;
+const profit=income-purchase-delivery;
+
+currentSale={
+client:document.getElementById("clientSelect").value,
+station,cans,sold,actual,sellPrice,buyPrice,delivery,profit,
+date:new Date().toISOString()
+};
+
+document.getElementById("sold").textContent=sold+" л";
+document.getElementById("actual").textContent=actual+" л";
+document.getElementById("sellPrice").textContent=sellPrice.toFixed(2)+" грн/л";
+document.getElementById("buyPrice").textContent=buyPrice.toFixed(2)+" грн/л";
+document.getElementById("deliveryCost").textContent=delivery+" грн";
+document.getElementById("profit").textContent=profit.toFixed(2)+" грн";
+document.getElementById("result").classList.remove("hidden");
+}
+
+function saveSale(){
+if(!currentSale){calculate();if(!currentSale)return}
+
+const list=sales();
+list.push(currentSale);
+write(KEY.sales,list);
+
+// Если цену изменили в поле, сохраняем её для следующего раза.
+if(currentSale.station){
+localStorage.setItem(KEY.station,String(currentSale.station));
+localStorage.setItem(KEY.sell,String(currentSale.sellPrice));
+}
+
+currentSale=null;
 renderHistory();
+updateToday();
 alert("Продажа сохранена");
 }
 
-function getSelectedSales(){
-const period=el("period").value;
-const today=todayKey();
-
-const yesterdayDate=new Date();
-yesterdayDate.setDate(yesterdayDate.getDate()-1);
-const yesterday=dateKey(yesterdayDate);
-
-if(period==="today")return sales.filter(s=>s.dateKey===today);
-
-if(period==="yesterday")return sales.filter(s=>s.dateKey===yesterday);
-
-if(period==="day"){
-const selected=el("reportDate").value||today;
-return sales.filter(s=>s.dateKey===selected);
-}
-
-if(period==="month"){
-const month=el("reportMonth").value||today.slice(0,7);
-return sales.filter(s=>s.dateKey.startsWith(month));
-}
-
-return sales;
-}
-
-function renderReports(){
-const period=el("period").value;
-
-el("dayFilter").classList.toggle("hidden",period!=="day");
-el("monthFilter").classList.toggle("hidden",period!=="month");
-
-if(!el("reportDate").value)el("reportDate").value=todayKey();
-if(!el("reportMonth").value)el("reportMonth").value=todayKey().slice(0,7);
-
-const list=getSelectedSales();
-
-const count=list.length;
-const volume=list.reduce((sum,s)=>sum+s.volume,0);
-const actual=list.reduce((sum,s)=>sum+s.actual,0);
-const revenue=list.reduce((sum,s)=>sum+s.revenue,0);
-const cost=list.reduce((sum,s)=>sum+s.cost,0);
-const delivery=list.reduce((sum,s)=>sum+s.delivery,0);
-const profit=list.reduce((sum,s)=>sum+s.profit,0);
-
-el("count").textContent=count;
-el("totalVolume").textContent=volume.toFixed(2);
-el("totalActual").textContent=actual.toFixed(2);
-el("totalRevenue").textContent=money(revenue);
-el("totalCost").textContent=money(cost);
-el("totalDelivery").textContent=money(delivery);
-el("totalProfit").textContent=money(profit);
-}
-
 function renderHistory(){
-const history=el("history");
+const box=document.getElementById("history");
+const list=sales();
 
-if(!sales.length){
-history.innerHTML="<p>Продаж пока нет</p>";
-return;
+if(!list.length){box.textContent="Продаж пока нет";return}
+box.innerHTML="";
+
+list.slice().reverse().forEach(s=>{
+const item=document.createElement("div");
+item.className="item";
+
+const date=new Date(s.date).toLocaleDateString("ru-RU");
+item.innerHTML="";
+
+const r1=document.createElement("div");
+r1.className="row";
+const name=document.createElement("span");
+name.textContent=s.client||"Без клиента";
+const amount=document.createElement("strong");
+amount.textContent=s.sold+" л";
+r1.append(name,amount);
+
+const r2=document.createElement("div");
+r2.className="row";
+const dateEl=document.createElement("span");
+dateEl.textContent=date+" · "+Number(s.sellPrice).toFixed(2)+" грн/л";
+const profit=document.createElement("strong");
+profit.style.color="#c084fc";
+profit.textContent=Number(s.profit).toFixed(2)+" грн";
+r2.append(dateEl,profit);
+
+item.append(r1,r2);
+box.appendChild(item);
+});
 }
 
-history.innerHTML=sales.map(s=>`
-<div class="sale">
-<b>${escapeHTML(s.fuel)}</b>
-<div class="small">${escapeHTML(s.date)}</div>
-<div>Продано: ${s.volume} л | Фактически: ${s.actual.toFixed(2)} л</div>
-<div>Цена продажи: ${money(s.salePrice)} грн/л</div>
-<div>Прибыль: <b style="color:#16803c">${money(s.profit)} грн</b></div>
-<button class="danger" onclick="deleteSale('${s.id}')">Удалить</button>
-</div>
-`).join("");
-}
+function addDebt(){
+const client=document.getElementById("debtClient").value;
+const amount=Number(document.getElementById("debtAmount").value);
+const comment=document.getElementById("debtComment").value.trim();
 
-function escapeHTML(value){
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-}
+if(!client){alert("Выберите клиента");return}
+if(!amount||amount<=0){alert("Введите сумму долга");return}
 
-function deleteSale(id){
-if(!confirm("Удалить эту продажу?"))return;
-sales=sales.filter(s=>String(s.id)!==String(id));
-saveSales();
-renderReports();
-renderHistory();
-}
-
-function clearHistory(){
-if(!confirm("Удалить всю историю продаж?"))return;
-sales=[];
-saveSales();
-renderReports();
-renderHistory();
-}
-
-function getPeriodName(){
-const period=el("period").value;
-
-if(period==="today")return "Сегодня";
-if(period==="yesterday")return "Вчера";
-if(period==="day")return "Дата: "+el("reportDate").value;
-if(period==="month")return "Месяц: "+el("reportMonth").value;
-
-return "Всё время";
-}
-
-function downloadPDF(){
-const list=getSelectedSales();
-
-const volume=list.reduce((sum,s)=>sum+s.volume,0);
-const actual=list.reduce((sum,s)=>sum+s.actual,0);
-const revenue=list.reduce((sum,s)=>sum+s.revenue,0);
-const cost=list.reduce((sum,s)=>sum+s.cost,0);
-const delivery=list.reduce((sum,s)=>sum+s.delivery,0);
-const profit=list.reduce((sum,s)=>sum+s.profit,0);
-
-el("printPeriod").textContent=getPeriodName()+" | "+new Date().toLocaleString("ru-UA");
-
-el("printStats").innerHTML=`
-<p>Количество продаж: ${list.length}</p>
-<p>Продано: ${volume.toFixed(2)} л</p>
-<p>Фактически залито: ${actual.toFixed(2)} л</p>
-<p>Выручка: ${money(revenue)} грн</p>
-<p>Стоимость топлива: ${money(cost)} грн</p>
-<p>Доставка: ${money(delivery)} грн</p>
-<h2>Прибыль: ${money(profit)} грн</h2>
-`;
-
-el("printHistory").innerHTML=list.map(s=>`
-<p>${escapeHTML(s.date)} | ${escapeHTML(s.fuel)} |
-Продано ${s.volume} л | Прибыль ${money(s.profit)} грн</p>
-`).join("");
-
-window.print();
-}
-
-function exportJSON(){
-const blob=new Blob([JSON.stringify(sales,null,2)],{type:"application/json"});
-const url=URL.createObjectURL(blob);
-const a=document.createElement("a");
-
-a.href=url;
-a.download="toplivo-backup-"+todayKey()+".json";
-document.body.appendChild(a);
-a.click();
-a.remove();
-
-URL.revokeObjectURL(url);
-}
-
-function importJSON(event){
-const file=event.target.files[0];
-if(!file)return;
-
-const reader=new FileReader();
-
-reader.onload=function(){
-try{
-const imported=JSON.parse(reader.result);
-
-if(!Array.isArray(imported)){
-throw new Error("Некорректный формат");
-}
-
-if(!confirm("Заменить текущую историю продаж резервной копией?")){
-return;
-}
-
-sales=imported.map(normalizeSale);
-saveSales();
-renderReports();
-renderHistory();
-
-alert("Резервная копия восстановлена");
-}catch{
-alert("Не удалось прочитать файл резервной копии");
-}
-
-event.target.value="";
-};
-
-reader.readAsText(file);
-}
-
-["stationPrice","volume","salePrice","delivery"].forEach(id=>{
-el(id).addEventListener("input",calculate);
+const list=debts();
+list.push({
+id:Date.now(),
+client,
+amount,
+comment,
+date:new Date().toISOString(),
+paid:false
 });
 
-el("reportDate").value=todayKey();
-el("reportMonth").value=todayKey().slice(0,7);
+write(KEY.debts,list);
+document.getElementById("debtAmount").value="";
+document.getElementById("debtComment").value="";
+renderDebts();
+updateToday();
+alert("Долг добавлен");
+}
 
-calculate();
-renderReports();
+function markPaid(id){
+const list=debts();
+const debt=list.find(x=>x.id===id);
+if(!debt)return;
+
+debt.paid=true;
+debt.paidDate=new Date().toISOString();
+write(KEY.debts,list);
+renderDebts();
+updateToday();
+}
+
+function renderDebts(){
+const box=document.getElementById("debtList");
+const list=debts();
+
+if(!list.length){box.textContent="Долгов пока нет";return}
+box.innerHTML="";
+
+list.slice().reverse().forEach(d=>{
+const item=document.createElement("div");
+item.className="item";
+
+const row=document.createElement("div");
+row.className="row";
+
+const name=document.createElement("span");
+name.textContent=d.client;
+
+const amount=document.createElement("strong");
+amount.textContent=Number(d.amount).toFixed(2)+" грн";
+row.append(name,amount);
+
+const note=document.createElement("div");
+note.style.cssText="font-size:12px;color:#9d8bad;margin-top:8px";
+note.textContent=(d.comment||"Без комментария")+" · "+new Date(d.date).toLocaleDateString("ru-RU");
+
+item.append(row,note);
+
+if(d.paid){
+const paid=document.createElement("div");
+paid.style.cssText="color:#a78bfa;font-size:12px;margin-top:8px";
+paid.textContent="✓ Оплачен";
+item.appendChild(paid);
+}else{
+const btn=document.createElement("button");
+btn.className="action secondary";
+btn.textContent="Отметить оплаченным";
+btn.onclick=()=>markPaid(d.id);
+item.appendChild(btn);
+}
+box.appendChild(item);
+});
+}
+
+function updateToday(){
+const list=sales();
+const today=new Date().toDateString();
+const todaySales=list.filter(s=>new Date(s.date).toDateString()===today);
+const profit=todaySales.reduce((sum,s)=>sum+Number(s.profit||0),0);
+
+document.getElementById("todayCount").textContent=todaySales.length;
+document.getElementById("todayProfit").textContent=profit.toFixed(2)+" грн";
+
+const debtTotal=debts()
+.filter(d=>!d.paid)
+.reduce((sum,d)=>sum+Number(d.amount||0),0);
+
+document.getElementById("totalDebt").textContent=debtTotal.toFixed(2)+" грн";
+}
+
+renderClients();
+loadPrices();
 renderHistory();
+renderDebts();
+updateToday();
 </script>
 </body>
 </html>
+
